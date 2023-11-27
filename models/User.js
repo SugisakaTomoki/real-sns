@@ -65,3 +65,5 @@ const UserSchema = new mongoose.Schema(
   // データを格納した日付を自動的に格納
   { timestamps: true }
 );
+// UserSchemaをUserという変数で宣言している
+module.exports = mongoose.model("User", UserSchema);

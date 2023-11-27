@@ -23,14 +23,15 @@ mongoose
   });
 
 // ミドルウェアの設定
+app.use(express.json());
 app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/posts", postRoute);
 
 // アプリケーション(app)が"/"へのGETリクエストを受け取った時に、クライアントに対して文字列を返すというエンドポイントの設定
-// app.get("/", (req, res) => {
-//   res.send("hello express");
-// });
+app.get("/", (req, res) => {
+  res.send("hello express");
+});
 // app.get("/users", (req, res) => {
 //   res.send("users express");
 // });
