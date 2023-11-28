@@ -1,3 +1,5 @@
+// ユーザー情報に関するデータスキーマ
+
 // mongooseライブラリを使用する
 const mongoose = require("mongoose");
 
