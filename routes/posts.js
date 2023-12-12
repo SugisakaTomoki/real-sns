@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
+const User = require("../models/User");
 
 // 投稿を作成する
 // ExpressのRouterを使って新しいエンドポイント"/"を定義
@@ -53,6 +54,64 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     return res.status(403).json(err);
   }
+});
+
+// 特定の投稿を取得する
+router.get("/id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    return res.status(200).json(post);
+  } catch (err) {
+    return res.status(403).json(err);
+  }
+});
+
+// 特定の投稿にいいねを押す
+router.put("/:id/like", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    // まだ投稿にいいねが押されていなかったら
+    if (!post.likes.includes(req.body.userId)) {
+      await post.updateOne({
+        $push: {
+          likes: req.body.userId,
+        },
+      });
+      return res.status(200).json("投稿にいいねを押しました！");
+      // 投稿にすでにいいねが押されていたら
+    } else {
+      // いいねしているユーザーIDを取り除く
+      await post.updateOne({
+        $pull: {
+          likes: req.body.userId,
+        },
+      });
+      return res.status(403).json("投稿にいいねを外しました");
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
+//タイムラインの投稿を取得
+router.get("/timeline/:userId", async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.params.userId);
+    const userPosts = await Post.find({ userId: currentUser._id });
+    // 自分がフォローしている友達の投稿内容をすべて取得する
+    const friendPosts = await Promise.all(
+      currentUser.followings.map((friendId) => {
+        return Post.find({ userId: friendId });
+      })
+    );
+    res.status(200).json(userPosts.concat(...friendPosts));
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get("/", (req, res) => {
+  console.log("post page");
 });
 
 module.exports = router;

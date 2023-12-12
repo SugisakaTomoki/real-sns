@@ -50,7 +50,7 @@ router.get("/:id", async (req, res) => {
     // 取得したユーザー情報から、特定のプロパティ(password,update)を取り除く
     const { password, updatedAt, ...other } = user._doc;
     // passwordやupdateAtを含まない形でユーザー情報をクライアントに返す
-    res.status(200).json(other);
+    return res.status(200).json(other);
   } catch (err) {
     return res.status(500).json(err);
   }
