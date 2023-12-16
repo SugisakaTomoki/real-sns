@@ -44,10 +44,30 @@ router.delete("/:id", async (req, res) => {
   }
 });
 // ユーザー情報取得
-router.get("/:id", async (req, res) => {
+// router.get("/:id", async (req, res) => {
+//   try {
+//     const user = await User.findById(req.params.id);
+//     // 取得したユーザー情報から、特定のプロパティ(password,update)を取り除く
+//     const { password, updatedAt, ...other } = user._doc;
+//     // passwordやupdateAtを含まない形でユーザー情報をクライアントに返す
+//     return res.status(200).json(other);
+//   } catch (err) {
+//     return res.status(500).json(err);
+//   }
+// });
+
+// クエリでユーザー情報を取得
+router.get("/", async (req, res) => {
+  // クエリパラメーターからuserIdとusernameを取得
+  const userId = req.query.userId;
+  const username = req.query.username;
   try {
-    const user = await User.findById(req.params.id);
-    // 取得したユーザー情報から、特定のプロパティ(password,update)を取り除く
+    // userId が指定されていれば、その ID に基づいてユーザー情報を取得
+    // そうでなければ、username に基づいてユーザー情報を取得
+    const user = userId
+      ? await User.findById(userId)
+      : await User.findOne({ username: username });
+
     const { password, updatedAt, ...other } = user._doc;
     // passwordやupdateAtを含まない形でユーザー情報をクライアントに返す
     return res.status(200).json(other);
@@ -57,6 +77,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // ユーザーのフォロー
+// ルーターを定義
 router.put("/:id/follow", async (req, res) => {
   // 自分自身をフォローしようとしている場合はエラーを返す
   if (req.body.userId !== req.params.id) {
